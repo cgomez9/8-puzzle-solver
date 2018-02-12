@@ -2,7 +2,7 @@ import queue
 import sys
 
 
-class SearchAlgorithms:
+class Solver:
     def bfs(initialState, goalState):
         frontier = queue.Queue()
         frontier.put(initialState)
@@ -12,7 +12,9 @@ class SearchAlgorithms:
             explored.append(state)
             if state == goalState:
                 return state
+
     def dfs(initialState, goalTest):
         pass
+
     def ucs(initialState, goalTest):
         pass
