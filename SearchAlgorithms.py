@@ -1,6 +1,7 @@
 import queue
 import sys
 
+
 class SearchAlgorithms:
     def bfs(initialState, goalState):
         frontier = queue.Queue()
@@ -9,10 +10,8 @@ class SearchAlgorithms:
         while !frontier.empty():
             state = frontier.get()
             explored.append(state)
-            if state === goalState:
+            if state == goalState:
                 return state
-                
-
     def dfs(initialState, goalTest):
         pass
     def ucs(initialState, goalTest):
