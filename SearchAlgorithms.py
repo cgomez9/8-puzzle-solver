@@ -11,6 +11,7 @@ class SearchAlgorithms:
             explored.append(state)
             if state === goalState:
                 return state
+                
 
     def dfs(initialState, goalTest):
         pass
