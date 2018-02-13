@@ -36,6 +36,6 @@ class Puzzle:
         left = 1 if self.blank_piece_position[column] - 1 >= 0 else left = 0
         possible_movements.append(left)
         # Blank space can move right
-        right = 1 if self.blank_piece_position[column] + 1 <= self.MAX_DIMENSION - 1 else left = right
+        right = 1 if self.blank_piece_position[column] + 1 <= self.MAX_DIMENSION - 1 else right = 0
         possible_movements.append(right)
         return possible_movements
