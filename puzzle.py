@@ -2,14 +2,15 @@ import sys
 
 
 class Puzzle:
-    table = []
-    blank_piece_position = {"row":0, "column":0}
-    MAX_DIMENSION = 3
-    SOLUTION_STATE = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8]
-    ]
+    def __init__(self):
+        self.table = []
+        self.blank_piece_position = {"row":0, "column":0}
+        self.MAX_DIMENSION = 3
+        self.SOLUTION_STATE = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8]
+        ]
 
     def fillFromString(self, initState):
         initStateIndex = 0
@@ -62,3 +63,14 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row + 1][blank_column]
             self.table[blank_row + 1][blank_column] = 0
             self.blank_piece_position["row"] += 1
+
+    def moveBlankLeft(self):
+        pass
+
+    def moveBlankRight(self):
+        pass
+
+    def printTable(self):
+        for row in self.table:
+            print(row)
+        print("")
