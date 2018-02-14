@@ -16,8 +16,7 @@ class Puzzle:
         new_column = []
         for row in range(0, self.MAX_DIMENSION):
             for column in range(0, self.MAX_DIMENSION):
-                new_column.append(initState[initStateIndex])
-                print(initState[initStateIndex])
+                new_column.append(int(initState[initStateIndex]))
                 if initState[initStateIndex] == '0':
                     self.blank_piece_position["row"] = row
                     self.blank_piece_position["column"] = column
@@ -26,7 +25,7 @@ class Puzzle:
             new_column = []
 
     def isSolved(self):
-        self.table == self.SOLUTION_STATE
+        return self.table == self.SOLUTION_STATE
 
     def getPossibleMovementsFromCurrentState(self):
         possible_movements = []

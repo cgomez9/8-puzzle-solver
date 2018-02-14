@@ -3,30 +3,31 @@ import sys
 from puzzle import Puzzle
 
 class Solver:
-    def bfs(initialState, goalState):
+    @staticmethod
+    def bfs(initialState):
         frontier = queue.Queue()
-        frontier.put(initialState)
+        initialPuzzle = Puzzle()
+        initialPuzzle.fillFromString(initialState.split(','))
+        frontier.put(initialPuzzle)
         explored = []
         while not frontier.empty():
             state = frontier.get()
+            print(state.isSolved())
             explored.append(state)
-            if state == goalState:
+            if state.isSolved():
                 return state
 
-    def dfs(initialState, goalTest):
+    @staticmethod
+    def dfs(self,initialState):
         pass
 
-    def ucs(initialState, goalTest):
+    @staticmethod
+    def ucs(self,initialState):
         pass
 
 method = sys.argv[1]
 initialState = sys.argv[2]
 
-print(method)
-print(initialState)
-
-puzzle = Puzzle()
-puzzle.fillFromString(initialState.split(','))
-print(puzzle.table)
-print(puzzle.blank_piece_position)
-print(puzzle.getPossibleMovementsFromCurrentState())
+solver = Solver()
+if method == 'bfs':
+    solver.bfs(initialState)
