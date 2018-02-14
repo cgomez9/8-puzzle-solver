@@ -24,6 +24,10 @@ class Puzzle:
             self.table.append(new_column)
             new_column = []
 
+    def fillFromPuzzle(self, puzzle):
+        self.table = puzzle.table
+        self.blank_piece_position = puzzle.blank_piece_position
+
     def isSolved(self):
         return self.table == self.SOLUTION_STATE
 
@@ -42,3 +46,19 @@ class Puzzle:
         right = 1 if self.blank_piece_position["column"] + 1 <= self.MAX_DIMENSION - 1 else 0
         possible_movements.append(right)
         return possible_movements
+
+    def moveBlankUp(self):
+        if self.blank_piece_position["row"] - 1 >= 0:
+            blank_row = self.blank_piece_position["row"]
+            blank_column = self.blank_piece_position["column"]
+            self.table[blank_row][blank_column] = self.table[blank_row - 1][blank_column]
+            self.table[blank_row - 1][blank_column] = 0
+            self.blank_piece_position["row"] -= 1
+
+    def moveBlankDown(self):
+        if self.blank_piece_position["row"] + 1 <= self.MAX_DIMENSION - 1:
+            blank_row = self.blank_piece_position["row"]
+            blank_column = self.blank_piece_position["column"]
+            self.table[blank_row][blank_column] = self.table[blank_row + 1][blank_column]
+            self.table[blank_row + 1][blank_column] = 0
+            self.blank_piece_position["row"] += 1
