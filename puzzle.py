@@ -3,6 +3,8 @@ import sys
 
 class Puzzle:
     def __init__(self):
+        self.parent = 0
+        self.puzzle_id = 0
         self.table = []
         self.blank_piece_position = {"row":0, "column":0}
         self.MAX_DIMENSION = 3
@@ -65,12 +67,35 @@ class Puzzle:
             self.blank_piece_position["row"] += 1
 
     def moveBlankLeft(self):
-        pass
+        if self.blank_piece_position["column"] - 1 >= 0:
+            blank_row = self.blank_piece_position["row"]
+            blank_column = self.blank_piece_position["column"]
+            self.table[blank_row][blank_column] = self.table[blank_row][blank_column - 1]
+            self.table[blank_row][blank_column - 1] = 0
+            self.blank_piece_position["column"] -= 1
 
     def moveBlankRight(self):
-        pass
+        if self.blank_piece_position["column"] + 1 <= self.MAX_DIMENSION - 1:
+            blank_row = self.blank_piece_position["row"]
+            blank_column = self.blank_piece_position["column"]
+            self.table[blank_row][blank_column] = self.table[blank_row][blank_column + 1]
+            self.table[blank_row][blank_column + 1] = 0
+            self.blank_piece_position["column"] += 1
 
     def printTable(self):
+        print("\033[H\033[J")
         for row in self.table:
             print(row)
         print("")
+
+    def setPuzzleId(self, puzzle_id):
+        self.puzzle_id = puzzle_id
+
+    def getPuzzleId(self):
+        return self.puzzle_id
+
+    def setParent(self, parent):
+        self.parent = parent
+
+    def getParent(self):
+        return self.parent
