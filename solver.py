@@ -10,83 +10,84 @@ class Solver:
         frontier = SetQueue()
         initialPuzzle = Puzzle()
         initialPuzzle.fillFromString(initialState.split(','))
-        initialPuzzle.setPuzzleId(1)
         frontier.put(initialPuzzle)
         explored = []
         while not frontier.empty():
             state = frontier.get()
             state.printTable()
-            explored.append(state.table)
+            state.setPuzzleId(len(explored))
+            explored.append(state)
             if state.isSolved():
-                return state
+                temp_solution_path = []
+                temp_solution_path.append(state.getMovement())
+                current_parent_id = state.getParent()
+                while current_parent_id > 0:
+                    parent_state = explored[current_parent_id]
+                    temp_solution_path.append(parent_state.getMovement())
+                    current_parent_id = parent_state.getParent()
+                real_solution_path = []
+                for element in reversed(temp_solution_path):
+                    real_solution_path.append(element)
+                return real_solution_path
             movedPuzzles = self.createListOfMovedPuzzles(
                 state,
                 explored
             )
             for puzzle in movedPuzzles:
-                puzzle.setPuzzleId(len(explored) + 1)
                 frontier.put(puzzle)
-            time.sleep(20)
+            time.sleep(0.1)
 
 
     def dfs(self, initialState):
         frontier = Stack()
-        initialPuzzle = Puzzle()
-        initialPuzzle.fillFromString(initialState.split(','))
         frontier.push(initialPuzzle)
-        explored = []
         while not frontier.isEmpty():
             state = frontier.pop()
-            state.printTable()
-            explored.append(state.table)
-            if state.isSolved():
-                return state
-            movedPuzzles = self.createListOfMovedPuzzles(
-                state,
-                state.getPossibleMovementsFromCurrentState(),
-                explored
-            )
-            for puzzle in movedPuzzles:
-                frontier.push(puzzle)
+            frontier.push(puzzle)
 
-    def ucs(self,initialState):
+    def a_star(self,initialState):
         pass
 
     def createListOfMovedPuzzles(self, originalPuzzle, explored):
         movedPuzzles = []
         moves = originalPuzzle.getPossibleMovementsFromCurrentState()
-        print(moves)
         if moves[0] == 1:
             movedUpPuzzle = copy.deepcopy(originalPuzzle)
             movedUpPuzzle.moveBlankUp()
             if self.puzzleIsNotRepeated(movedUpPuzzle, explored):
                 movedUpPuzzle.setParent(originalPuzzle.getPuzzleId())
+                movedUpPuzzle.setMovement('Up')
                 movedPuzzles.append(movedUpPuzzle)
         if moves[1] == 1:
             movedDownPuzzle = copy.deepcopy(originalPuzzle)
             movedDownPuzzle.moveBlankDown()
             if self.puzzleIsNotRepeated(movedDownPuzzle, explored):
                 movedDownPuzzle.setParent(originalPuzzle.getPuzzleId())
+                movedDownPuzzle.setMovement('Down')
                 movedPuzzles.append(movedDownPuzzle)
         if moves[2] == 1:
             movedLeftPuzzle = copy.deepcopy(originalPuzzle)
             movedLeftPuzzle.moveBlankLeft()
             if self.puzzleIsNotRepeated(movedLeftPuzzle, explored):
                 movedLeftPuzzle.setParent(originalPuzzle.getPuzzleId())
+                movedLeftPuzzle.setMovement('Left')
                 movedPuzzles.append(movedLeftPuzzle)
         if moves[3] == 1:
             movedRightPuzzle = copy.deepcopy(originalPuzzle)
             movedRightPuzzle.moveBlankRight()
             if self.puzzleIsNotRepeated(movedRightPuzzle, explored):
                 movedRightPuzzle.setParent(originalPuzzle.getPuzzleId())
+                movedRightPuzzle.setMovement('Right')
                 movedPuzzles.append(movedRightPuzzle)
 
         return movedPuzzles
 
     @staticmethod
     def puzzleIsNotRepeated(puzzle, explored):
-        return puzzle.table not in explored
-
+        for state in explored:
+            if puzzle.table == state.table:
+                return False
+        return True
 
 
 method = sys.argv[1]
@@ -96,7 +97,6 @@ solver = Solver()
 if method == 'bfs':
     solution = solver.bfs(initialState)
     print("")
-    print("Padre: {}".format(solution.getParent()))
-    print("ID: {}".format(solution.getPuzzleId()))
+    print(solution)
 elif method == 'dfs':
     solution = solver.dfs(initialState)

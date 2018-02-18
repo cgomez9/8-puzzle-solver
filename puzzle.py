@@ -3,8 +3,8 @@ import sys
 
 class Puzzle:
     def __init__(self):
-        self.parent = 0
-        self.puzzle_id = 0
+        self.parent = -1
+        self.puzzle_id = -1
         self.movement = ''
         self.table = []
         self.blank_piece_position = {"row":0, "column":0}
@@ -84,7 +84,7 @@ class Puzzle:
             self.blank_piece_position["column"] += 1
 
     def printTable(self):
-        #print("\033[H\033[J")
+        print("\033[H\033[J")
         for row in self.table:
             print(row)
         print("")
