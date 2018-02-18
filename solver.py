@@ -40,10 +40,33 @@ class Solver:
 
     def dfs(self, initialState):
         frontier = Stack()
+        initialPuzzle = Puzzle()
+        initialPuzzle.fillFromString(initialState.split(','))
         frontier.push(initialPuzzle)
+        explored = []
         while not frontier.isEmpty():
             state = frontier.pop()
-            frontier.push(puzzle)
+            state.printTable()
+            state.setPuzzleId(len(explored))
+            explored.append(state)
+            if state.isSolved():
+                temp_solution_path = []
+                temp_solution_path.append(state.getMovement())
+                current_parent_id = state.getParent()
+                while current_parent_id > 0:
+                    parent_state = explored[current_parent_id]
+                    temp_solution_path.append(parent_state.getMovement())
+                    current_parent_id = parent_state.getParent()
+                real_solution_path = []
+                for element in reversed(temp_solution_path):
+                    real_solution_path.append(element)
+                return real_solution_path
+            movedPuzzles = self.createListOfMovedPuzzles(
+                state,
+                explored
+            )
+            for puzzle in movedPuzzles:
+                frontier.push(puzzle)
 
     def a_star(self,initialState):
         pass
@@ -100,3 +123,5 @@ if method == 'bfs':
     print(solution)
 elif method == 'dfs':
     solution = solver.dfs(initialState)
+    print("")
+    print(solution)
