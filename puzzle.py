@@ -5,10 +5,12 @@ class Puzzle:
     def __init__(self):
         self.parent = -1
         self.puzzle_id = -1
+        self.level = 1
         self.movement = ''
         self.table = []
         self.blank_piece_position = {"row":0, "column":0}
         self.MAX_DIMENSION = 3
+        for column in range(0, self.MAX_DIMENSION):
         self.SOLUTION_STATE = [
             [0, 1, 2],
             [3, 4, 5],
@@ -19,7 +21,6 @@ class Puzzle:
         initStateIndex = 0
         new_column = []
         for row in range(0, self.MAX_DIMENSION):
-            for column in range(0, self.MAX_DIMENSION):
                 new_column.append(int(initState[initStateIndex]))
                 if initState[initStateIndex] == '0':
                     self.blank_piece_position["row"] = row
@@ -106,3 +107,9 @@ class Puzzle:
 
     def getMovement(self):
         return self.movement
+
+    def setLevel(self, level):
+        self.level = level
+
+    def getLevel(self):
+        return self.level
