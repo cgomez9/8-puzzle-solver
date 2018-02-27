@@ -10,33 +10,26 @@ from solution import Solution
 class Solver:
     def bfs(self, initialState):
         start = time.time()
+        max_level = 0
         frontier = SetQueue()
-        forbidden = []
         initialPuzzle = Puzzle()
         initialPuzzle.fillFromString(initialState.split(','))
         frontier.put(initialPuzzle)
-        forbidden.append(initialPuzzle.table)
         explored = []
+        forbidden = SetQueue()
+        forbidden.put(initialPuzzle)
         while not frontier.empty():
             state = frontier.get()
-            state.printTable()
             state.setPuzzleId(len(explored))
             explored.append(state)
             if state.isSolved():
-                temp_solution_path = []
-                temp_solution_path.append(state.getMovement())
-                current_parent_id = state.getParent()
-                while current_parent_id > 0:
-                    parent_state = explored[current_parent_id]
-                    temp_solution_path.append(parent_state.getMovement())
-                    current_parent_id = parent_state.getParent()
-                real_solution_path = []
-                for element in reversed(temp_solution_path):
-                    real_solution_path.append(element)
                 solution = Solution()
-                solution.path_to_goal = real_solution_path
+                solution.path_to_goal = self.findPathForSolution(state,explored)
                 solution.nodes_expanded = len(explored) - 1
-                solution.max_ram_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / float(1024)
+                solution.search_depth = state.getLevel()
+                solution.max_search_depth = max_level
+                mem_use = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+                solution.max_ram_usage = mem_use / float(1024)
                 solution.running_time = time.time()-start;
                 self.writeSolutionToFile(solution)
                 break
@@ -44,39 +37,34 @@ class Solver:
                 state,
                 forbidden
             )
+            if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
+                max_level = movedPuzzles[0].getLevel()
             for puzzle in movedPuzzles:
                 frontier.put(puzzle)
-                forbidden.append(puzzle.table)
+                forbidden.put(puzzle)
 
     def dfs(self, initialState):
         start = time.time()
+        max_level = 0
         frontier = SetStack()
-        forbidden = []
         initialPuzzle = Puzzle()
         initialPuzzle.fillFromString(initialState.split(','))
         frontier.put(initialPuzzle)
-        forbidden.append(initialPuzzle.table)
         explored = []
+        forbidden = SetQueue()
+        forbidden.put(initialPuzzle)
         while not frontier.empty():
             state = frontier.get()
-            state.printTable()
             state.setPuzzleId(len(explored))
             explored.append(state)
             if state.isSolved():
-                temp_solution_path = []
-                temp_solution_path.append(state.getMovement())
-                current_parent_id = state.getParent()
-                while current_parent_id > 0:
-                    parent_state = explored[current_parent_id]
-                    temp_solution_path.append(parent_state.getMovement())
-                    current_parent_id = parent_state.getParent()
-                real_solution_path = []
-                for element in reversed(temp_solution_path):
-                    real_solution_path.append(element)
                 solution = Solution()
-                solution.path_to_goal = real_solution_path
-                solution.nodes_expanded = len(explored)-1
-                solution.max_ram_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / float(1024)
+                solution.path_to_goal = self.findPathForSolution(state,explored)
+                solution.nodes_expanded = len(explored) - 1
+                solution.search_depth = state.getLevel()
+                solution.max_search_depth = max_level
+                mem_use = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+                solution.max_ram_usage = mem_use / float(1024)
                 solution.running_time = time.time()-start;
                 self.writeSolutionToFile(solution)
                 break
@@ -84,9 +72,11 @@ class Solver:
                 state,
                 forbidden
             )
+            if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
+                max_level = movedPuzzles[0].getLevel()
             for puzzle in reversed(movedPuzzles):
                 frontier.put(puzzle)
-                forbidden.append(puzzle.table)
+                forbidden.put(puzzle)
 
 
     def a_star(self,initialState):
@@ -96,7 +86,8 @@ class Solver:
         movedPuzzles = []
         moves = originalPuzzle.getPossibleMovementsFromCurrentState()
         if moves[0] == 1:
-            movedUpPuzzle = copy.deepcopy(originalPuzzle)
+            movedUpPuzzle = Puzzle()
+            movedUpPuzzle.fillFromPuzzle(originalPuzzle)
             movedUpPuzzle.moveBlankUp()
             if not self.puzzleIsRepeated(movedUpPuzzle, forbidden):
                 movedUpPuzzle.setParent(originalPuzzle.getPuzzleId())
@@ -104,7 +95,8 @@ class Solver:
                 movedUpPuzzle.setMovement('Up')
                 movedPuzzles.append(movedUpPuzzle)
         if moves[1] == 1:
-            movedDownPuzzle = copy.deepcopy(originalPuzzle)
+            movedDownPuzzle = Puzzle()
+            movedDownPuzzle.fillFromPuzzle(originalPuzzle)
             movedDownPuzzle.moveBlankDown()
             if not self.puzzleIsRepeated(movedDownPuzzle, forbidden):
                 movedDownPuzzle.setParent(originalPuzzle.getPuzzleId())
@@ -112,7 +104,8 @@ class Solver:
                 movedDownPuzzle.setMovement('Down')
                 movedPuzzles.append(movedDownPuzzle)
         if moves[2] == 1:
-            movedLeftPuzzle = copy.deepcopy(originalPuzzle)
+            movedLeftPuzzle = Puzzle()
+            movedLeftPuzzle.fillFromPuzzle(originalPuzzle)
             movedLeftPuzzle.moveBlankLeft()
             if not self.puzzleIsRepeated(movedLeftPuzzle, forbidden):
                 movedLeftPuzzle.setParent(originalPuzzle.getPuzzleId())
@@ -120,29 +113,44 @@ class Solver:
                 movedLeftPuzzle.setMovement('Left')
                 movedPuzzles.append(movedLeftPuzzle)
         if moves[3] == 1:
-            movedRightPuzzle = copy.deepcopy(originalPuzzle)
+            movedRightPuzzle = Puzzle()
+            movedRightPuzzle.fillFromPuzzle(originalPuzzle)
             movedRightPuzzle.moveBlankRight()
             if not self.puzzleIsRepeated(movedRightPuzzle, forbidden):
                 movedRightPuzzle.setParent(originalPuzzle.getPuzzleId())
                 movedRightPuzzle.setLevel(originalPuzzle.getLevel() + 1)
                 movedRightPuzzle.setMovement('Right')
                 movedPuzzles.append(movedRightPuzzle)
-
         return movedPuzzles
 
     @staticmethod
     def puzzleIsRepeated(puzzle, forbidden):
-        return puzzle.table in forbidden
+        return forbidden.hasElement(puzzle)
 
     def writeSolutionToFile(self, solution):
         file = open("output.txt","w")
         file.write("path_to_goal: {}\n".format(solution.path_to_goal))
         file.write("cost_of_path: {}\n".format(len(solution.path_to_goal)))
         file.write("nodes_expanded: {}\n".format(solution.nodes_expanded))
-        file.write("max_search_depth\n")
+        file.write("search_depth: {}\n".format(solution.search_depth))
+        file.write("max_search_depth: {}\n".format(solution.max_search_depth))
         file.write("running_time: {}\n".format(solution.running_time))
         file.write("max_ram_usage: {}\n".format(solution.max_ram_usage))
         file.close()
+
+    @staticmethod
+    def findPathForSolution(state, explored):
+        temp_solution_path = []
+        temp_solution_path.append(state.getMovement())
+        current_parent_id = state.getParent()
+        while current_parent_id > 0:
+            parent_state = explored[current_parent_id]
+            temp_solution_path.append(parent_state.getMovement())
+            current_parent_id = parent_state.getParent()
+        real_solution_path = []
+        for element in reversed(temp_solution_path):
+            real_solution_path.append(element)
+        return real_solution_path
 
 
 method = sys.argv[1]

@@ -1,6 +1,7 @@
-path_to_goal: ['Up']
-cost_of_path: 1
-nodes_expanded: 1
-max_search_depth
-running_time: 0.000359058380127
-max_ram_usage: 7.1953125
+path_to_goal: ['Up', 'Left', 'Left']
+cost_of_path: 3
+nodes_expanded: 181437
+search_depth: 3
+max_search_depth: 66125
+running_time: 7.24101400375
+max_ram_usage: 488.79296875

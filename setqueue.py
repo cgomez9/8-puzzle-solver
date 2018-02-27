@@ -10,3 +10,6 @@ class SetQueue(queue.Queue):
 
     def _get(self):
         return self.queue.pop(False)
+
+    def hasElement(self,element):
+        return element in self.queue

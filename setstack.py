@@ -10,3 +10,6 @@ class SetStack(queue.Queue):
 
     def _get(self):
         return self.queue.pop(True)
+
+    def hasElement(self,element):
+        return element in self.queue

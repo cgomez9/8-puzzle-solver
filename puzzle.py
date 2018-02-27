@@ -5,12 +5,12 @@ class Puzzle:
     def __init__(self):
         self.parent = -1
         self.puzzle_id = -1
-        self.level = 1
+        self.table_signature = ()
+        self.level = 0
         self.movement = ''
         self.table = []
         self.blank_piece_position = {"row":0, "column":0}
         self.MAX_DIMENSION = 3
-        for column in range(0, self.MAX_DIMENSION):
         self.SOLUTION_STATE = [
             [0, 1, 2],
             [3, 4, 5],
@@ -21,6 +21,7 @@ class Puzzle:
         initStateIndex = 0
         new_column = []
         for row in range(0, self.MAX_DIMENSION):
+            for column in range(0, self.MAX_DIMENSION):
                 new_column.append(int(initState[initStateIndex]))
                 if initState[initStateIndex] == '0':
                     self.blank_piece_position["row"] = row
@@ -28,10 +29,14 @@ class Puzzle:
                 initStateIndex += 1
             self.table.append(new_column)
             new_column = []
+        self.calculateTableSignature()
 
     def fillFromPuzzle(self, puzzle):
-        self.table = puzzle.table
-        self.blank_piece_position = puzzle.blank_piece_position
+        for row in puzzle.table:
+            self.table.append(list(row))
+        #self.table = list(puzzle.table)
+        self.blank_piece_position = dict(puzzle.blank_piece_position)
+        #self.calculateTableSignature()
 
     def isSolved(self):
         return self.table == self.SOLUTION_STATE
@@ -59,6 +64,7 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row - 1][blank_column]
             self.table[blank_row - 1][blank_column] = 0
             self.blank_piece_position["row"] -= 1
+            self.calculateTableSignature()
 
     def moveBlankDown(self):
         if self.blank_piece_position["row"] + 1 <= self.MAX_DIMENSION - 1:
@@ -67,6 +73,7 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row + 1][blank_column]
             self.table[blank_row + 1][blank_column] = 0
             self.blank_piece_position["row"] += 1
+            self.calculateTableSignature()
 
     def moveBlankLeft(self):
         if self.blank_piece_position["column"] - 1 >= 0:
@@ -75,6 +82,7 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row][blank_column - 1]
             self.table[blank_row][blank_column - 1] = 0
             self.blank_piece_position["column"] -= 1
+            self.calculateTableSignature()
 
     def moveBlankRight(self):
         if self.blank_piece_position["column"] + 1 <= self.MAX_DIMENSION - 1:
@@ -83,9 +91,10 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row][blank_column + 1]
             self.table[blank_row][blank_column + 1] = 0
             self.blank_piece_position["column"] += 1
+            self.calculateTableSignature()
 
     def printTable(self):
-        print("\033[H\033[J")
+        #print("\033[H\033[J")
         for row in self.table:
             print(row)
         print("")
@@ -113,3 +122,28 @@ class Puzzle:
 
     def getLevel(self):
         return self.level
+
+    def calculateTableSignature(self):
+        self.table_signature = self.getTableSignature()
+
+    def getTableSignature(self):
+        return (
+            self.table[0][0],
+            self.table[0][1],
+            self.table[0][2],
+            self.table[1][0],
+            self.table[1][1],
+            self.table[1][2],
+            self.table[2][0],
+            self.table[2][1],
+            self.table[2][2]
+        )
+
+    def __hash__(self):
+        return hash(self.table_signature)
+
+    def __eq__(self, other):
+        return (
+            self.__class__ == other.__class__ and
+            self.table_signature == other.table_signature
+        )
