@@ -80,7 +80,39 @@ class Solver:
 
 
     def a_star(self,initialState):
-        pass
+        start = time.time()
+        max_level = 0
+        frontier = SetQueue()
+        initialPuzzle = Puzzle()
+        initialPuzzle.fillFromString(initialState.split(','))
+        frontier.put(initialPuzzle)
+        explored = []
+        forbidden = SetQueue()
+        forbidden.put(initialPuzzle)
+        while not frontier.empty():
+            state = frontier.get()
+            state.setPuzzleId(len(explored))
+            explored.append(state)
+            if state.isSolved():
+                solution = Solution()
+                solution.path_to_goal = self.findPathForSolution(state,explored)
+                solution.nodes_expanded = len(explored) - 1
+                solution.search_depth = state.getLevel()
+                solution.max_search_depth = max_level
+                mem_use = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+                solution.max_ram_usage = mem_use / float(1024)
+                solution.running_time = time.time()-start;
+                self.writeSolutionToFile(solution)
+                break
+            movedPuzzles = self.createListOfMovedPuzzles(
+                state,
+                forbidden
+            )
+            if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
+                max_level = movedPuzzles[0].getLevel()
+            for puzzle in movedPuzzles:
+                frontier.put(puzzle)
+                forbidden.put(puzzle)
 
     def createListOfMovedPuzzles(self, originalPuzzle, forbidden):
         movedPuzzles = []

@@ -1,4 +1,5 @@
 import sys
+import re
 
 
 class Puzzle:
@@ -15,6 +16,16 @@ class Puzzle:
             [0, 1, 2],
             [3, 4, 5],
             [6, 7, 8]
+        ]
+        self.SOLUTION_STATE_INDEX = [
+            {"row":0, "column":1},
+            {"row":0, "column":2},
+            {"row":1, "column":0},
+            {"row":1, "column":1},
+            {"row":1, "column":2},
+            {"row":2, "column":0},
+            {"row":2, "column":1},
+            {"row":2, "column":2}
         ]
 
     def fillFromString(self, initState):
@@ -56,6 +67,15 @@ class Puzzle:
         right = 1 if self.blank_piece_position["column"] + 1 <= self.MAX_DIMENSION - 1 else 0
         possible_movements.append(right)
         return possible_movements
+
+    def calculateManhattanDistance(self):
+        manhattanDistance = 0
+        for indexRow,row in enumerate(range(0, self.MAX_DIMENSION)):
+            for indexColumn,element in enumerate(range(0, self.MAX_DIMENSION)):
+                rowDistance = abs(indexRow - self.SOLUTION_STATE_INDEX[element]["row"])
+                columnDistance = abs(indexColumn - self.SOLUTION_STATE_INDEX[element]["column"])
+                manhattanDistance += rowDistance + columnDistance
+
 
     def moveBlankUp(self):
         if self.blank_piece_position["row"] - 1 >= 0:
