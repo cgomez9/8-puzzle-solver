@@ -18,6 +18,7 @@ class Puzzle:
             [6, 7, 8]
         ]
         self.SOLUTION_STATE_INDEX = [
+            {"row":0, "column":0},
             {"row":0, "column":1},
             {"row":0, "column":2},
             {"row":1, "column":0},
@@ -27,6 +28,7 @@ class Puzzle:
             {"row":2, "column":1},
             {"row":2, "column":2}
         ]
+        self.manhattanDistance = 0
 
     def fillFromString(self, initState):
         initStateIndex = 0
@@ -45,9 +47,8 @@ class Puzzle:
     def fillFromPuzzle(self, puzzle):
         for row in puzzle.table:
             self.table.append(list(row))
-        #self.table = list(puzzle.table)
         self.blank_piece_position = dict(puzzle.blank_piece_position)
-        #self.calculateTableSignature()
+        self.calculateTableSignature()
 
     def isSolved(self):
         return self.table == self.SOLUTION_STATE
@@ -70,11 +71,13 @@ class Puzzle:
 
     def calculateManhattanDistance(self):
         manhattanDistance = 0
-        for indexRow,row in enumerate(range(0, self.MAX_DIMENSION)):
-            for indexColumn,element in enumerate(range(0, self.MAX_DIMENSION)):
-                rowDistance = abs(indexRow - self.SOLUTION_STATE_INDEX[element]["row"])
-                columnDistance = abs(indexColumn - self.SOLUTION_STATE_INDEX[element]["column"])
-                manhattanDistance += rowDistance + columnDistance
+        for indexRow,row in enumerate(self.table):
+            for indexColumn,element in enumerate(row):
+                if element != 0:
+                    rowDistance = abs(indexRow - self.SOLUTION_STATE_INDEX[element]["row"])
+                    columnDistance = abs(indexColumn - self.SOLUTION_STATE_INDEX[element]["column"])
+                    manhattanDistance += rowDistance + columnDistance
+        return manhattanDistance
 
 
     def moveBlankUp(self):
@@ -167,3 +170,6 @@ class Puzzle:
             self.__class__ == other.__class__ and
             self.table_signature == other.table_signature
         )
+
+    def __lt__(self, other):
+        return self.calculateManhattanDistance() < other.calculateManhattanDistance()
