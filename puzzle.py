@@ -45,7 +45,6 @@ class Puzzle:
             self.table.append(new_column)
             new_column = []
         self.calculateTableSignature()
-        self.importance = 1
 
     def fillFromPuzzle(self, puzzle):
         for row in puzzle.table:
