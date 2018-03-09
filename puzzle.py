@@ -1,5 +1,6 @@
 import sys
 import re
+from datetime import datetime
 
 
 class Puzzle:
@@ -29,6 +30,8 @@ class Puzzle:
             {"row":2, "column":2}
         ]
         self.manhattanDistance = 0
+        self.importance = 0
+        self.creation_date = datetime.now()
 
     def fillFromString(self, initState):
         initStateIndex = 0
@@ -43,6 +46,7 @@ class Puzzle:
             self.table.append(new_column)
             new_column = []
         self.calculateTableSignature()
+        self.importance = 1
 
     def fillFromPuzzle(self, puzzle):
         for row in puzzle.table:
@@ -88,6 +92,7 @@ class Puzzle:
             self.table[blank_row - 1][blank_column] = 0
             self.blank_piece_position["row"] -= 1
             self.calculateTableSignature()
+            self.importance = 4
 
     def moveBlankDown(self):
         if self.blank_piece_position["row"] + 1 <= self.MAX_DIMENSION - 1:
@@ -97,6 +102,7 @@ class Puzzle:
             self.table[blank_row + 1][blank_column] = 0
             self.blank_piece_position["row"] += 1
             self.calculateTableSignature()
+            self.importance = 3
 
     def moveBlankLeft(self):
         if self.blank_piece_position["column"] - 1 >= 0:
@@ -106,6 +112,7 @@ class Puzzle:
             self.table[blank_row][blank_column - 1] = 0
             self.blank_piece_position["column"] -= 1
             self.calculateTableSignature()
+            self.importance = 2
 
     def moveBlankRight(self):
         if self.blank_piece_position["column"] + 1 <= self.MAX_DIMENSION - 1:
@@ -115,6 +122,7 @@ class Puzzle:
             self.table[blank_row][blank_column + 1] = 0
             self.blank_piece_position["column"] += 1
             self.calculateTableSignature()
+            self.importance = 1
 
     def printTable(self):
         #print("\033[H\033[J")
@@ -172,4 +180,9 @@ class Puzzle:
         )
 
     def __lt__(self, other):
-        return self.calculateManhattanDistance() < other.calculateManhattanDistance()
+        selfHeuristic = self.calculateManhattanDistance() + self.level
+        otherHeuristic = other.calculateManhattanDistance() + other.level
+        if selfHeuristic == otherHeuristic:
+            return self.creation_date < other.creation_date
+        else: 
+            return selfHeuristic < otherHeuristic
