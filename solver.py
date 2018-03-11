@@ -78,7 +78,6 @@ class Solver:
         while heapq.nlargest(1, frontier):
             state = heapq.heappop(frontier)
             state.setPuzzleId(len(explored))
-            forbidden.put(state)
             explored.append(state)
             if state.isSolved():
                 solution = self.getSolution(state,explored,start,max_level)
@@ -91,19 +90,8 @@ class Solver:
             if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
                 max_level = movedPuzzles[0].getLevel()
             for puzzle in movedPuzzles:
-                if puzzle not in frontier:
-                    heapq.heappush(frontier,puzzle)
-                else:
-                    puzzleIndex = frontier.index(puzzle)
-                    manDis = frontier[puzzleIndex].calculateManhattanDistance()
-                    heapPuzzleHeuristic = manDis + frontier[puzzleIndex].getLevel()
-                    puzzleManDis = puzzle.calculateManhattanDistance()
-                    puzzleHeuristic = puzzleManDis + puzzle.getLevel()
-                    if heapPuzzleHeuristic < puzzleHeuristic:
-                        frontier.remove(puzzle)
-                        heapq.heapify(frontier)
-                        heapq.heappush(frontier,puzzle)
-
+                heapq.heappush(frontier,puzzle)
+                forbidden.put(puzzle)
 
     def createListOfMovedPuzzles(self, originalPuzzle, forbidden):
         movedPuzzles = []
@@ -148,6 +136,10 @@ class Solver:
 
     @staticmethod
     def puzzleIsRepeated(puzzle, forbidden):
+        return forbidden.hasElement(puzzle)
+
+    @staticmethod
+    def puzzleIsInFrontier(puzzle, frontier):
         return forbidden.hasElement(puzzle)
 
     def getSolution(self, state, explored, start, max_level):

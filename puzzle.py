@@ -46,12 +46,14 @@ class Puzzle:
             self.table.append(new_column)
             new_column = []
         self.calculateTableSignature()
+        self.calculateManhattanDistance()
 
     def fillFromPuzzle(self, puzzle):
         for row in puzzle.table:
             self.table.append(list(row))
         self.blank_piece_position = dict(puzzle.blank_piece_position)
         self.calculateTableSignature()
+        self.calculateManhattanDistance()
 
     def isSolved(self):
         return self.table == self.SOLUTION_STATE
@@ -80,7 +82,7 @@ class Puzzle:
                     rowDistance = abs(indexRow - self.SOLUTION_STATE_INDEX[element]["row"])
                     columnDistance = abs(indexColumn - self.SOLUTION_STATE_INDEX[element]["column"])
                     manhattanDistance += rowDistance + columnDistance
-        return manhattanDistance
+        self.manhattanDistance = manhattanDistance
 
 
     def moveBlankUp(self):
@@ -91,6 +93,7 @@ class Puzzle:
             self.table[blank_row - 1][blank_column] = 0
             self.blank_piece_position["row"] -= 1
             self.calculateTableSignature()
+            self.calculateManhattanDistance()
             self.importance = 4
 
     def moveBlankDown(self):
@@ -101,6 +104,7 @@ class Puzzle:
             self.table[blank_row + 1][blank_column] = 0
             self.blank_piece_position["row"] += 1
             self.calculateTableSignature()
+            self.calculateManhattanDistance()
             self.importance = 3
 
     def moveBlankLeft(self):
@@ -111,6 +115,7 @@ class Puzzle:
             self.table[blank_row][blank_column - 1] = 0
             self.blank_piece_position["column"] -= 1
             self.calculateTableSignature()
+            self.calculateManhattanDistance()
             self.importance = 2
 
     def moveBlankRight(self):
@@ -121,6 +126,7 @@ class Puzzle:
             self.table[blank_row][blank_column + 1] = 0
             self.blank_piece_position["column"] += 1
             self.calculateTableSignature()
+            self.calculateManhattanDistance()
             self.importance = 1
 
     def printTable(self):
@@ -179,9 +185,8 @@ class Puzzle:
         )
 
     def __lt__(self, other):
-        selfHeuristic = self.calculateManhattanDistance() + self.level
-        otherHeuristic = other.calculateManhattanDistance() + other.level
-        print(selfHeuristic,otherHeuristic)
+        selfHeuristic = self.manhattanDistance + self.level
+        otherHeuristic = other.manhattanDistance + other.level
         if selfHeuristic == otherHeuristic:
             if self.importance == other.importance:
                 return self.creation_date < other.creation_date
