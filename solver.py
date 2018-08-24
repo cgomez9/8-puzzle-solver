@@ -9,151 +9,151 @@ from puzzle import Puzzle
 from solution import Solution
 
 class Solver:
-    def bfs(self, initialState):
+    def bfs(self, initial_state):
         start = time.time()
         max_level = 0
         frontier = SetQueue()
-        initialPuzzle = Puzzle()
-        initialPuzzle.fillFromString(initialState.split(','))
-        frontier.put(initialPuzzle)
+        initial_puzzle = Puzzle()
+        initial_puzzle.fill_from_string(initial_state.split(','))
+        frontier.put(initial_puzzle)
         explored = []
         forbidden = SetQueue()
-        forbidden.put(initialPuzzle)
+        forbidden.put(initial_puzzle)
         while not frontier.empty():
             state = frontier.get()
-            state.setPuzzleId(len(explored))
+            state.set_puzzle_id(len(explored))
             explored.append(state)
-            if state.isSolved():
-                solution = self.getSolution(state,explored,start,max_level)
-                self.writeSolutionToFile(solution)
+            if state.is_solved():
+                solution = self.get_solution(state,explored,start,max_level)
+                self.write_solution_to_file(solution)
                 break
-            movedPuzzles = self.createListOfMovedPuzzles(
+            moved_puzzles = self.create_list_of_moved_puzzles(
                 state,
                 forbidden
             )
-            if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
-                max_level = movedPuzzles[0].getLevel()
-            for puzzle in movedPuzzles:
+            if moved_puzzles and moved_puzzles[0].get_level() > max_level:
+                max_level = moved_puzzles[0].get_level()
+            for puzzle in moved_puzzles:
                 frontier.put(puzzle)
                 forbidden.put(puzzle)
 
-    def dfs(self, initialState):
+    def dfs(self, initial_state):
         start = time.time()
         max_level = 0
         frontier = SetStack()
-        initialPuzzle = Puzzle()
-        initialPuzzle.fillFromString(initialState.split(','))
-        frontier.put(initialPuzzle)
+        initial_puzzle = Puzzle()
+        initial_puzzle.fill_from_string(initial_state.split(','))
+        frontier.put(initial_puzzle)
         explored = []
         forbidden = SetQueue()
-        forbidden.put(initialPuzzle)
+        forbidden.put(initial_puzzle)
         while not frontier.empty():
             state = frontier.get()
-            state.setPuzzleId(len(explored))
+            state.set_puzzle_id(len(explored))
             explored.append(state)
-            if state.isSolved():
-                solution = self.getSolution(state,explored,start,max_level)
-                self.writeSolutionToFile(solution)
+            if state.is_solved():
+                solution = self.get_solution(state,explored,start,max_level)
+                self.write_solution_to_file(solution)
                 break
-            movedPuzzles = self.createListOfMovedPuzzles(
+            moved_puzzles = self.create_list_of_moved_puzzles(
                 state,
                 forbidden
             )
-            if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
-                max_level = movedPuzzles[0].getLevel()
-            for puzzle in reversed(movedPuzzles):
+            if moved_puzzles and moved_puzzles[0].get_level() > max_level:
+                max_level = moved_puzzles[0].get_level()
+            for puzzle in reversed(moved_puzzles):
                 frontier.put(puzzle)
                 forbidden.put(puzzle)
 
-    def ast(self,initialState):
+    def ast(self,initial_state):
         start = time.time()
         max_level = 0
         frontier = []
         heapq.heapify(frontier)
-        initialPuzzle = Puzzle()
-        initialPuzzle.fillFromString(initialState.split(','))
-        heapq.heappush(frontier,initialPuzzle)
+        initial_puzzle = Puzzle()
+        initial_puzzle.fill_from_string(initial_state.split(','))
+        heapq.heappush(frontier,initial_puzzle)
         explored = []
         forbidden = SetQueue()
         while heapq.nlargest(1, frontier):
             state = heapq.heappop(frontier)
-            state.setPuzzleId(len(explored))
+            state.set_puzzle_id(len(explored))
             explored.append(state)
-            if state.isSolved():
-                solution = self.getSolution(state,explored,start,max_level)
-                self.writeSolutionToFile(solution)
+            if state.is_solved():
+                solution = self.get_solution(state,explored,start,max_level)
+                self.write_solution_to_file(solution)
                 break
-            movedPuzzles = self.createListOfMovedPuzzles(
+            moved_puzzles = self.create_list_of_moved_puzzles(
                 state,
                 forbidden
             )
-            if movedPuzzles and movedPuzzles[0].getLevel() > max_level:
-                max_level = movedPuzzles[0].getLevel()
-            for puzzle in movedPuzzles:
+            if moved_puzzles and moved_puzzles[0].get_level() > max_level:
+                max_level = moved_puzzles[0].get_level()
+            for puzzle in moved_puzzles:
                 heapq.heappush(frontier,puzzle)
                 forbidden.put(puzzle)
 
-    def createListOfMovedPuzzles(self, originalPuzzle, forbidden):
-        movedPuzzles = []
-        moves = originalPuzzle.getPossibleMovementsFromCurrentState()
+    def create_list_of_moved_puzzles(self, original_puzzle, forbidden):
+        moved_puzzles = []
+        moves = original_puzzle.get_possible_movements_from_current_state()
         if moves[0] == 1:
             movedUpPuzzle = Puzzle()
-            movedUpPuzzle.fillFromPuzzle(originalPuzzle)
+            movedUpPuzzle.fill_from_puzzle(original_puzzle)
             movedUpPuzzle.moveBlankUp()
-            if not self.puzzleIsRepeated(movedUpPuzzle, forbidden):
-                movedUpPuzzle.setParent(originalPuzzle.getPuzzleId())
-                movedUpPuzzle.setLevel(originalPuzzle.getLevel() + 1)
-                movedUpPuzzle.setMovement('Up')
-                movedPuzzles.append(movedUpPuzzle)
+            if not self.puzzle_is_repeated(movedUpPuzzle, forbidden):
+                movedUpPuzzle.set_parent(original_puzzle.get_puzzle_id())
+                movedUpPuzzle.set_level(original_puzzle.get_level() + 1)
+                movedUpPuzzle.set_movement('Up')
+                moved_puzzles.append(movedUpPuzzle)
         if moves[1] == 1:
-            movedDownPuzzle = Puzzle()
-            movedDownPuzzle.fillFromPuzzle(originalPuzzle)
-            movedDownPuzzle.moveBlankDown()
-            if not self.puzzleIsRepeated(movedDownPuzzle, forbidden):
-                movedDownPuzzle.setParent(originalPuzzle.getPuzzleId())
-                movedDownPuzzle.setLevel(originalPuzzle.getLevel() + 1)
-                movedDownPuzzle.setMovement('Down')
-                movedPuzzles.append(movedDownPuzzle)
+            moved_down_puzzle = Puzzle()
+            moved_down_puzzle.fill_from_puzzle(original_puzzle)
+            moved_down_puzzle.moveBlankDown()
+            if not self.puzzle_is_repeated(moved_down_puzzle, forbidden):
+                moved_down_puzzle.set_parent(original_puzzle.get_puzzle_id())
+                moved_down_puzzle.set_level(original_puzzle.get_level() + 1)
+                moved_down_puzzle.set_movement('Down')
+                moved_puzzles.append(moved_down_puzzle)
         if moves[2] == 1:
-            movedLeftPuzzle = Puzzle()
-            movedLeftPuzzle.fillFromPuzzle(originalPuzzle)
-            movedLeftPuzzle.moveBlankLeft()
-            if not self.puzzleIsRepeated(movedLeftPuzzle, forbidden):
-                movedLeftPuzzle.setParent(originalPuzzle.getPuzzleId())
-                movedLeftPuzzle.setLevel(originalPuzzle.getLevel() + 1)
-                movedLeftPuzzle.setMovement('Left')
-                movedPuzzles.append(movedLeftPuzzle)
+            moved_left_puzzle = Puzzle()
+            moved_left_puzzle.fill_from_puzzle(original_puzzle)
+            moved_left_puzzle.moveBlankLeft()
+            if not self.puzzle_is_repeated(moved_left_puzzle, forbidden):
+                moved_left_puzzle.set_parent(original_puzzle.get_puzzle_id())
+                moved_left_puzzle.set_level(original_puzzle.get_level() + 1)
+                moved_left_puzzle.set_movement('Left')
+                moved_puzzles.append(moved_left_puzzle)
         if moves[3] == 1:
-            movedRightPuzzle = Puzzle()
-            movedRightPuzzle.fillFromPuzzle(originalPuzzle)
-            movedRightPuzzle.moveBlankRight()
-            if not self.puzzleIsRepeated(movedRightPuzzle, forbidden):
-                movedRightPuzzle.setParent(originalPuzzle.getPuzzleId())
-                movedRightPuzzle.setLevel(originalPuzzle.getLevel() + 1)
-                movedRightPuzzle.setMovement('Right')
-                movedPuzzles.append(movedRightPuzzle)
-        return movedPuzzles
+            moved_right_puzzle = Puzzle()
+            moved_right_puzzle.fill_from_puzzle(original_puzzle)
+            moved_right_puzzle.moveBlankRight()
+            if not self.puzzle_is_repeated(moved_right_puzzle, forbidden):
+                moved_right_puzzle.set_parent(original_puzzle.get_puzzle_id())
+                moved_right_puzzle.set_level(original_puzzle.get_level() + 1)
+                moved_right_puzzle.set_movement('Right')
+                moved_puzzles.append(moved_right_puzzle)
+        return moved_puzzles
 
     @staticmethod
-    def puzzleIsRepeated(puzzle, forbidden):
+    def puzzle_is_repeated(puzzle, forbidden):
         return forbidden.hasElement(puzzle)
 
     @staticmethod
     def puzzleIsInFrontier(puzzle, frontier):
         return forbidden.hasElement(puzzle)
 
-    def getSolution(self, state, explored, start, max_level):
+    def get_solution(self, state, explored, start, max_level):
         solution = Solution()
-        solution.path_to_goal = self.findPathForSolution(state,explored)
+        solution.path_to_goal = self.find_path_for_solution(state,explored)
         solution.nodes_expanded = len(explored) - 1
-        solution.search_depth = state.getLevel()
+        solution.search_depth = state.get_level()
         solution.max_search_depth = max_level
         mem_use = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         solution.max_ram_usage = mem_use / float(1024)
         solution.running_time = time.time()-start;
         return solution
 
-    def writeSolutionToFile(self, solution):
+    def write_solution_to_file(self, solution):
         file = open("output.txt","w")
         file.write("path_to_goal: {}\n".format(solution.path_to_goal))
         file.write("cost_of_path: {}\n".format(len(solution.path_to_goal)))
@@ -165,14 +165,14 @@ class Solver:
         file.close()
 
     @staticmethod
-    def findPathForSolution(state, explored):
+    def find_path_for_solution(state, explored):
         temp_solution_path = []
-        temp_solution_path.append(state.getMovement())
-        current_parent_id = state.getParent()
+        temp_solution_path.append(state.get_movement())
+        current_parent_id = state.get_parent()
         while current_parent_id > 0:
             parent_state = explored[current_parent_id]
-            temp_solution_path.append(parent_state.getMovement())
-            current_parent_id = parent_state.getParent()
+            temp_solution_path.append(parent_state.get_movement())
+            current_parent_id = parent_state.get_parent()
         real_solution_path = []
         for element in reversed(temp_solution_path):
             real_solution_path.append(element)
@@ -180,12 +180,12 @@ class Solver:
 
 
 method = sys.argv[1]
-initialState = sys.argv[2]
+initial_state = sys.argv[2]
 
 solver = Solver()
 if method == 'bfs':
-    solver.bfs(initialState)
+    solver.bfs(initial_state)
 elif method == 'dfs':
-    solver.dfs(initialState)
+    solver.dfs(initial_state)
 elif method == 'ast':
-    solver.ast(initialState)
+    solver.ast(initial_state)

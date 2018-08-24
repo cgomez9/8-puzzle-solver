@@ -29,36 +29,36 @@ class Puzzle:
             {"row":2, "column":1},
             {"row":2, "column":2}
         ]
-        self.manhattanDistance = 0
+        self.manhattan_distance = 0
         self.creation_date = datetime.now()
         self.importance = 0
 
-    def fillFromString(self, initState):
-        initStateIndex = 0
+    def fill_from_string(self, init_state):
+        init_state_index = 0
         new_column = []
         for row in range(0, self.MAX_DIMENSION):
             for column in range(0, self.MAX_DIMENSION):
-                new_column.append(int(initState[initStateIndex]))
-                if initState[initStateIndex] == '0':
+                new_column.append(int(init_state[init_state_index]))
+                if init_state[init_state_index] == '0':
                     self.blank_piece_position["row"] = row
                     self.blank_piece_position["column"] = column
-                initStateIndex += 1
+                init_state_index += 1
             self.table.append(new_column)
             new_column = []
-        self.calculateTableSignature()
-        self.calculateManhattanDistance()
+        self.calculate_table_signature()
+        self.calculate_manhattan_distance()
 
-    def fillFromPuzzle(self, puzzle):
+    def fill_from_puzzle(self, puzzle):
         for row in puzzle.table:
             self.table.append(list(row))
         self.blank_piece_position = dict(puzzle.blank_piece_position)
-        self.calculateTableSignature()
-        self.calculateManhattanDistance()
+        self.calculate_table_signature()
+        self.calculate_manhattan_distance()
 
-    def isSolved(self):
+    def is_solved(self):
         return self.table == self.SOLUTION_STATE
 
-    def getPossibleMovementsFromCurrentState(self):
+    def get_possible_movements_from_current_state(self):
         possible_movements = []
         # Blank space can move up
         up = 1 if self.blank_piece_position["row"] - 1 >= 0 else 0
@@ -74,15 +74,15 @@ class Puzzle:
         possible_movements.append(right)
         return possible_movements
 
-    def calculateManhattanDistance(self):
-        manhattanDistance = 0
-        for indexRow,row in enumerate(self.table):
-            for indexColumn,element in enumerate(row):
+    def calculate_manhattan_distance(self):
+        manhattan_distance = 0
+        for index_row,row in enumerate(self.table):
+            for index_column,element in enumerate(row):
                 if element != 0:
-                    rowDistance = abs(indexRow - self.SOLUTION_STATE_INDEX[element]["row"])
-                    columnDistance = abs(indexColumn - self.SOLUTION_STATE_INDEX[element]["column"])
-                    manhattanDistance += rowDistance + columnDistance
-        self.manhattanDistance = manhattanDistance
+                    row_distance = abs(index_row - self.SOLUTION_STATE_INDEX[element]["row"])
+                    column_distance = abs(index_column - self.SOLUTION_STATE_INDEX[element]["column"])
+                    manhattan_distance += row_distance + column_distance
+        self.manhattan_distance = manhattan_distance
 
 
     def moveBlankUp(self):
@@ -92,8 +92,8 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row - 1][blank_column]
             self.table[blank_row - 1][blank_column] = 0
             self.blank_piece_position["row"] -= 1
-            self.calculateTableSignature()
-            self.calculateManhattanDistance()
+            self.calculate_table_signature()
+            self.calculate_manhattan_distance()
             self.importance = 4
 
     def moveBlankDown(self):
@@ -103,8 +103,8 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row + 1][blank_column]
             self.table[blank_row + 1][blank_column] = 0
             self.blank_piece_position["row"] += 1
-            self.calculateTableSignature()
-            self.calculateManhattanDistance()
+            self.calculate_table_signature()
+            self.calculate_manhattan_distance()
             self.importance = 3
 
     def moveBlankLeft(self):
@@ -114,8 +114,8 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row][blank_column - 1]
             self.table[blank_row][blank_column - 1] = 0
             self.blank_piece_position["column"] -= 1
-            self.calculateTableSignature()
-            self.calculateManhattanDistance()
+            self.calculate_table_signature()
+            self.calculate_manhattan_distance()
             self.importance = 2
 
     def moveBlankRight(self):
@@ -125,44 +125,44 @@ class Puzzle:
             self.table[blank_row][blank_column] = self.table[blank_row][blank_column + 1]
             self.table[blank_row][blank_column + 1] = 0
             self.blank_piece_position["column"] += 1
-            self.calculateTableSignature()
-            self.calculateManhattanDistance()
+            self.calculate_table_signature()
+            self.calculate_manhattan_distance()
             self.importance = 1
 
-    def printTable(self):
+    def print_table(self):
         #print("\033[H\033[J")
         for row in self.table:
             print(row)
         print("")
 
-    def setPuzzleId(self, puzzle_id):
+    def set_puzzle_id(self, puzzle_id):
         self.puzzle_id = puzzle_id
 
-    def getPuzzleId(self):
+    def get_puzzle_id(self):
         return self.puzzle_id
 
-    def setParent(self, parent):
+    def set_parent(self, parent):
         self.parent = parent
 
-    def getParent(self):
+    def get_parent(self):
         return self.parent
 
-    def setMovement(self, movement):
+    def set_movement(self, movement):
         self.movement = movement
 
-    def getMovement(self):
+    def get_movement(self):
         return self.movement
 
-    def setLevel(self, level):
+    def set_level(self, level):
         self.level = level
 
-    def getLevel(self):
+    def get_level(self):
         return self.level
 
-    def calculateTableSignature(self):
-        self.table_signature = self.getTableSignature()
+    def calculate_table_signature(self):
+        self.table_signature = self.get_table_signature()
 
-    def getTableSignature(self):
+    def get_table_signature(self):
         return (
             self.table[0][0],
             self.table[0][1],
@@ -185,12 +185,12 @@ class Puzzle:
         )
 
     def __lt__(self, other):
-        selfHeuristic = self.manhattanDistance + self.level
-        otherHeuristic = other.manhattanDistance + other.level
-        if selfHeuristic == otherHeuristic:
+        self_heuristic = self.manhattan_distance + self.level
+        other_heuristic = other.manhattan_distance + other.level
+        if self_heuristic == other_heuristic:
             if self.importance == other.importance:
                 return self.creation_date < other.creation_date
             else:
                 return self.importance < other.importance
         else:
-            return selfHeuristic < otherHeuristic
+            return self_heuristic < other_heuristic

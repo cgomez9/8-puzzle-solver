@@ -1,7 +1,7 @@
-path_to_goal: ['Right', 'Right', 'Down', 'Down', 'Left', 'Up', 'Left', 'Up', 'Right', 'Right', 'Down', 'Down', 'Left', 'Up', 'Left', 'Down', 'Right', 'Up', 'Up', 'Left', 'Down', 'Right', 'Up', 'Right', 'Down', 'Down', 'Left', 'Up', 'Left', 'Up']
+path_to_goal: ['Down', 'Right', 'Down', 'Right', 'Up', 'Up', 'Left', 'Down', 'Down', 'Right', 'Up', 'Up', 'Left', 'Down', 'Down', 'Left', 'Up', 'Up', 'Right', 'Down', 'Down', 'Left', 'Up', 'Right', 'Down', 'Right', 'Up', 'Left', 'Up', 'Left']
 cost_of_path: 30
-nodes_expanded: 16254
+nodes_expanded: 181423
 search_depth: 30
-max_search_depth: 30
-running_time: 58.7878239155
-max_ram_usage: 136.49609375
+max_search_depth: 31
+running_time: 15.9389219284
+max_ram_usage: 972.98046875
